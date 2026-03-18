@@ -1,0 +1,86 @@
+timestamp,direction,topic,command
+00:47:00.819,RECV,vision_topic,vision|ambilBola
+00:47:00.819,SEND,cmd_status_topic_,received
+00:47:00.820,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:00.841,SEND,vision_cmd_topic,berhenti
+00:47:00.950,SEND,vision_cmd_topic,putarKiri
+00:47:02.345,SEND,vision_cmd_topic,putarKiriPelan
+00:47:03.349,SEND,vision_cmd_topic,maju
+00:47:04.875,SEND,vision_cmd_topic,majuPelan
+00:47:05.034,SEND,vision_cmd_topic,berhenti
+00:47:05.035,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_ambilBola)|1
+00:47:05.053,RECV,vision_topic,vision|hadapGawang
+00:47:05.056,SEND,cmd_status_topic_,received
+00:47:05.058,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:05.157,SEND,vision_cmd_topic,putarKanan
+00:47:07.282,SEND,vision_cmd_topic,putarKananPelan
+00:47:08.071,SEND,vision_cmd_topic,berhenti
+00:47:08.073,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_hadapGawang)|1
+00:47:13.535,RECV,vision_topic,vision|ambilBola
+00:47:13.535,SEND,cmd_status_topic_,received
+00:47:13.535,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:13.632,SEND,vision_cmd_topic,putarKananPelan
+00:47:13.771,SEND,vision_cmd_topic,putarKanan
+00:47:13.876,SEND,vision_cmd_topic,putarKananPelan
+00:47:15.379,SEND,vision_cmd_topic,maju
+00:47:16.901,SEND,vision_cmd_topic,majuPelan
+00:47:17.533,SEND,vision_cmd_topic,berhenti
+00:47:17.534,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_ambilBola)|1
+00:47:17.581,RECV,vision_topic,vision|hadapGawang
+00:47:17.581,SEND,cmd_status_topic_,received
+00:47:17.581,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:17.595,SEND,vision_cmd_topic,putarKiri
+00:47:18.375,SEND,vision_cmd_topic,putarKiriPelan
+00:47:18.880,SEND,vision_cmd_topic,berhenti
+00:47:18.885,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_hadapGawang)|1
+00:47:25.031,RECV,vision_topic,vision|ambilBola
+00:47:25.032,SEND,cmd_status_topic_,received
+00:47:25.032,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:25.065,SEND,vision_cmd_topic,berhenti
+00:47:25.214,SEND,vision_cmd_topic,putarKananPelan
+00:47:26.991,SEND,vision_cmd_topic,maju
+00:47:28.637,SEND,vision_cmd_topic,putarKananPelan
+00:47:28.790,SEND,vision_cmd_topic,putarKanan
+00:47:29.012,SEND,vision_cmd_topic,majuPelan
+00:47:29.149,SEND,vision_cmd_topic,berhenti
+00:47:29.150,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_ambilBola)|1
+00:47:29.175,RECV,vision_topic,vision|hadapGawang
+00:47:29.175,SEND,cmd_status_topic_,received
+00:47:29.175,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:29.202,SEND,vision_cmd_topic,putarKiri
+00:47:30.110,SEND,vision_cmd_topic,putarKiriPelan
+00:47:31.018,SEND,vision_cmd_topic,berhenti
+00:47:31.018,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_hadapGawang)|1
+00:47:35.956,RECV,vision_topic,vision|ambilBola
+00:47:35.956,SEND,cmd_status_topic_,received
+00:47:35.956,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:36.070,SEND,vision_cmd_topic,putarKiriPelan
+00:47:36.076,SEND,vision_cmd_topic,putarKiri
+00:47:36.567,SEND,vision_cmd_topic,putarKiriPelan
+00:47:37.346,SEND,vision_cmd_topic,maju
+00:47:39.634,SEND,vision_cmd_topic,majuPelan
+00:47:39.870,SEND,vision_cmd_topic,berhenti
+00:47:39.870,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_ambilBola)|1
+00:47:39.907,RECV,vision_topic,vision|hadapGawang
+00:47:39.908,SEND,cmd_status_topic_,received
+00:47:39.908,SEND,vision_cmd_topic,hidupkanPenggiring
+00:47:39.922,SEND,vision_cmd_topic,putarKanan
+00:47:40.790,SEND,vision_cmd_topic,putarKananPelan
+00:47:41.567,SEND,vision_cmd_topic,berhenti
+00:47:41.571,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_hadapGawang)|1
+00:48:20.362,RECV,vision_topic,vision|ambilBola
+00:48:20.362,SEND,cmd_status_topic_,received
+00:48:20.362,SEND,vision_cmd_topic,hidupkanPenggiring
+00:48:20.395,SEND,vision_cmd_topic,putarKanan
+00:48:21.021,SEND,vision_cmd_topic,putarKananPelan
+00:48:21.768,SEND,vision_cmd_topic,maju
+00:48:22.911,SEND,vision_cmd_topic,majuPelan
+00:48:23.284,SEND,vision_cmd_topic,berhenti
+00:48:23.288,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_ambilBola)|1
+00:48:23.308,RECV,vision_topic,vision|hadapGawang
+00:48:23.309,SEND,cmd_status_topic_,received
+00:48:23.311,SEND,vision_cmd_topic,hidupkanPenggiring
+00:48:23.318,SEND,vision_cmd_topic,putarKiri
+00:48:24.338,SEND,vision_cmd_topic,putarKiriPelan
+00:48:24.997,SEND,vision_cmd_topic,berhenti
+00:48:25.000,SEND,cmd_status_topic_,[Vision] Selesai menjalankan perintah (vision_hadapGawang)|1
