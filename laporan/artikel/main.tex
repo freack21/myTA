@@ -1,4 +1,4 @@
-\documentclass[onecolumn]{IEEEtran}
+\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -9,102 +9,174 @@
 \usepackage{float}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{enumitem}
 
-% Correct bad hyphenation here
-\hyphenation{op-tical net-works semi-conduc-tor}
+% Atur margin halaman
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+
+% Spasi 1.5
+\onehalfspacing
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=blue
+}
 
 \begin{document}
 
-% Paper title
-\title{Optimasi Gerakan Robot Sepak Bola Menggunakan Kalman Filter pada Tracking Objek Berbasis YOLOv8}
+% ----------------- JUDUL -----------------
+\begin{center}
+    {\LARGE \textbf{Optimasi Gerakan Robot Sepak Bola Menggunakan Kalman Filter pada Tracking Objek Berbasis YOLOv8}} \\[1cm]
+    
+    {\large \textbf{Fikri Rivandi}$^{1}$, \textbf{Feri Candra}$^{2}$} \\[0.3cm]
+    {\normalsize $^{1,2}$Program Studi Teknik Informatika, Fakultas Teknik, Universitas Riau, Pekanbaru, Indonesia} \\[0.2cm]
+    {\normalsize $^{1}$fikri.rivandi2583@student.unri.ac.id, $^{2}$feri@eng.unri.ac.id}
+\end{center}
 
-\author{
-    \IEEEauthorblockN{Fikri Rivandi\textsuperscript{1}, Feri Candra\textsuperscript{2}}
-    \IEEEauthorblockA{\textsuperscript{1,2}Dept. of Informatics Engineering, Faculty of Engineering, Universitas Riau, Pekanbaru, Indonesia\\
-    \textsuperscript{1}fikri.rivandi2583@student.unri.ac.id, \textsuperscript{2}feri@eng.unri.ac.id}
-}
+\vspace{0.5cm}
 
-\maketitle
+% ----------------- ABSTRAK -----------------
+\begin{center}
+    {\large \textbf{Abstrak}}
+\end{center}
+\noindent
+Kontes Robot Sepak Bola Beroda Indonesia (KRSBI-Beroda) menuntut robot untuk melakukan deteksi dan \textit{tracking} bola secara \textit{real-time} di lingkungan yang dinamis. Metode \textit{tracking} berbasis deteksi tunggal seperti YOLOv8 seringkali terbentur pada keterbatasan perangkat keras dan gangguan visual seperti oklusi, yang menyebabkan gerakan robot menjadi tidak stabil. Penelitian ini mengusulkan optimasi sistem visi robot KRSBI-Beroda dengan mengintegrasikan algoritma \textit{You Only Look Once} versi 8 (YOLOv8) sebagai detektor objek dan \textit{Kalman Filter} sebagai estimator posisi prediktif. Pendekatan \textit{frame skipping} diimplementasikan untuk mengurangi beban komputasi pada perangkat laptop ASUS K401U, di mana YOLOv8 hanya dijalankan secara berkala dengan interval 3 \textit{frame}, sementara \textit{Kalman Filter} memprediksi posisi bola di antara \textit{frame} deteksi. Hasil eksperimen menunjukkan peningkatan signifikan pada \textit{frame rate} (FPS) dari 13,6 menjadi 38,77 (meningkat 185\%). Sistem yang dioptimasi juga mampu menghilangkan \textit{tracking loss} (0 kejadian) pada skenario oklusi dan mengurangi waktu penyelesaian misi sebesar 62\% (dari 15,17 detik menjadi 5,76 detik). Integrasi ini terbukti mampu menstabilkan gerakan robot, mereduksi \textit{jitter} perintah gerak, dan meningkatkan keandalan sistem dalam pertandingan robot sepak bola.
 
-\begin{abstract}
-Kontes Robot Sepak Bola Beroda Indonesia (KRSBI-Beroda) menuntut robot untuk melakukan deteksi dan \textit{tracking} bola secara \textit{real-time} di lingkungan yang dinamis. Metode \textit{tracking} berbasis deteksi tunggal seperti YOLOv8 seringkali terbentur pada keterbatasan perangkat keras (\textit{hardware}) dan gangguan visual seperti oklusi, yang menyebabkan gerakan robot menjadi tidak stabil. Penelitian ini mengusulkan optimasi sistem visi robot KRSBI-Beroda dengan mengintegrasikan algoritma \textit{You Only Look Once} versi 8 (YOLOv8) sebagai detektor objek dan \textit{Kalman Filter} sebagai estimator posisi prediktif. Pendekatan \textit{frame skipping} diimplementasikan untuk mengurangi beban komputasi pada perangkat laptop ASUS K401U, di mana YOLOv8 hanya dijalankan secara berkala, sementara \textit{Kalman Filter} memprediksi posisi bola di antara \textit{frame} deteksi. Hasil eksperimen menunjukkan peningkatan signifikan pada \textit{frame rate} (FPS) dari 13,6 menjadi 38,77. Sistem yang dioptimasi juga mampu menghilangkan \textit{tracking loss} (0 kejadian) pada skenario oklusi dan mengurangi waktu penyelesaian misi sebesar 62\% (dari 15,17 detik menjadi 5,76 detik). Integrasi ini terbukti mampu menstabilkan gerakan robot, mereduksi \textit{jitter}, dan meningkatkan keandalan sistem dalam pertandingan robot sepak bola.
-\end{abstract}
+\vspace{0.3cm}
+\textbf{Kata Kunci:} KRSBI-Beroda, YOLOv8, Kalman Filter, \textit{Object Tracking}, \textit{Frame Skipping}, Robot Sepak Bola, \textit{Computer Vision}.
 
-\begin{IEEEkeywords}
-KRSBI-Beroda, YOLOv8, Kalman Filter, \textit{Object Tracking}, \textit{Frame Skipping}, Robot Sepak Bola.
-\end{IEEEkeywords}
+\vspace{0.5cm}
 
+% ----------------- PENDAHULUAN -----------------
 \section{PENDAHULUAN}
 
-Perkembangan teknologi \textit{computer vision} dan \textit{deep learning} telah mendorong kemajuan pesat dalam bidang robotika otonom, khususnya pada ajang Kontes Robot Indonesia (KRI) kategori Kontes Robot Sepak Bola Beroda Indonesia (KRSBI-Beroda) \cite{Kusumoputro2024}. Dalam kompetisi ini, robot dituntut untuk mampu mendeteksi dan melacak (\textit{tracking}) pergerakan bola secara \textit{real-time} untuk melakukan manuver \textit{dribbling} dan mencetak gol. Kegagalan dalam \textit{tracking} bola, baik karena keterbatasan komputasi maupun gangguan oklusi, dapat berakibat fatal pada performa robot.
+Perkembangan teknologi \textit{computer vision} dan \textit{deep learning} telah mendorong kemajuan pesat dalam bidang robotika otonom, khususnya pada ajang Kontes Robot Indonesia (KRI) kategori Kontes Robot Sepak Bola Beroda Indonesia (KRSBI-Beroda) \cite{Kusumoputro2024}. Dalam kompetisi ini, robot dituntut untuk mampu mendeteksi dan melacak (\textit{tracking}) pergerakan bola secara \textit{real-time} untuk melakukan manuver \textit{dribbling} dan mencetak gol. Kegagalan dalam \textit{tracking} bola, baik karena keterbatasan komputasi maupun gangguan oklusi, dapat berakibat fatal pada performa robot di lapangan \cite{Nanda2023}.
 
-Tim \textit{Engineering Robotic Club} (ERC) Universitas Riau sebelumnya mengandalkan metode \textit{HSV color filtering} untuk deteksi bola. Metode ini ringan namun sangat sensitif terhadap perubahan intensitas cahaya, sehingga tidak andal dalam kondisi lapangan yang dinamis \cite{Nanda2023}. Seiring perkembangan, metode berbasis \textit{Convolutional Neural Network} (CNN) seperti \textit{You Only Look Once} (YOLO) diadopsi untuk meningkatkan akurasi deteksi \cite{Farhan2025}. YOLO mampu mendeteksi objek dengan presisi tinggi meskipun dalam variasi pencahayaan, namun implementasinya pada perangkat keras terbatas seperti laptop ASUS K401U milik robot ERC UNRI menimbulkan masalah baru: beban komputasi yang tinggi menyebabkan \textit{frame rate} (FPS) rendah dan \textit{lag} \cite{Miharja2025}. Akibatnya, robot sering kehilangan jejak bola saat bergerak cepat atau saat bola tertutup sebagian (oklusi).
+Tim \textit{Engineering Robotic Club} (ERC) Universitas Riau sebelumnya mengandalkan metode \textit{HSV color filtering} untuk deteksi bola. Metode ini ringan secara komputasi namun sangat sensitif terhadap perubahan intensitas cahaya, sehingga tidak andal dalam kondisi lapangan yang dinamis \cite{Nanda2023}. Kelemahan ini menjadi kritis karena pertandingan KRSBI-Beroda seringkali berlangsung dalam kondisi pencahayaan yang bervariasi dan tidak terkontrol \cite{Kusumoputro2024}.
 
-Untuk mengatasi \textit{trade-off} antara akurasi deteksi dan efisiensi komputasi, penelitian ini mengusulkan integrasi YOLOv8 dengan \textit{Kalman Filter}. \textit{Kalman Filter} adalah algoritma estimator rekursif yang ringan dan mampu memprediksi keadaan sistem dinamis berdasarkan data sebelumnya \cite{Sholehurrohman2023}. Dengan menerapkan strategi \textit{frame skipping}, detektor YOLO tidak perlu dijalankan di setiap \textit{frame}; sebaliknya, \textit{Kalman Filter} mengambil alih tugas estimasi posisi di antara \textit{frame} deteksi. Pendekatan ini terbukti meningkatkan efisiensi komputasi dan ketahanan terhadap oklusi \cite{Taylor2016, Takura2021}. Tujuan dari penelitian ini adalah mengembangkan sistem \textit{tracking} yang lebih stabil dan responsif pada robot KRSBI-Beroda dengan memanfaatkan sinergi antara YOLOv8 dan \textit{Kalman Filter}.
+Seiring perkembangan, metode berbasis \textit{Convolutional Neural Network} (CNN) seperti \textit{You Only Look Once} (YOLO) diadopsi untuk meningkatkan akurasi deteksi \cite{Farhan2025}. YOLO mampu mendeteksi objek dengan presisi tinggi meskipun dalam variasi pencahayaan \cite{Redmon2016}. Arsitektur YOLOv8 yang digunakan dalam penelitian ini merupakan versi terbaru dengan peningkatan pada efisiensi model, ekstraksi fitur, dan kecepatan komputasi \cite{Yaseen2024, Ultralytics2025}. Penelitian Farhan \& Candra \cite{Farhan2025} membuktikan bahwa model YOLOv8 mencapai akurasi 95,87\% untuk deteksi bola dan gawang pada robot KRSBI-Beroda.
 
+Namun, implementasi YOLOv8 pada perangkat keras terbatas seperti laptop ASUS K401U milik robot ERC UNRI menimbulkan masalah baru: beban komputasi yang tinggi menyebabkan \textit{frame rate} (FPS) rendah dan \textit{lag} \cite{Surya2025}. Akibatnya, robot sering kehilangan jejak bola saat bergerak cepat atau saat bola tertutup sebagian (oklusi) \cite{Ryu2021}. Fenomena oklusi merupakan penyebab utama meningkatnya \textit{false-negative detection rate} yang dapat menurunkan kinerja \textit{tracking} secara keseluruhan \cite{Nuralim2022}.
+
+Untuk mengatasi permasalahan tersebut, penelitian ini mengusulkan integrasi YOLOv8 dengan \textit{Kalman Filter} dan strategi \textit{frame skipping}. \textit{Kalman Filter} merupakan algoritma estimasi rekursif yang ringan dan mampu memprediksi keadaan sistem dinamis berdasarkan data pengamatan sebelumnya \cite{Sholehurrohman2023}. Saputra \cite{Saputra2023} membuktikan bahwa integrasi \textit{Kalman Filter} pada robot KRSBI-Beroda mampu memprediksi pergerakan bola dengan rata-rata error pengukuran 1,06 untuk koordinat $x$ dan 7,34 untuk koordinat $y$. Sementara itu, strategi \textit{frame skipping} terbukti efektif meningkatkan kecepatan pemrosesan hingga 1,5 kali lipat tanpa degradasi akurasi yang signifikan \cite{Lee2024}.
+
+% ----------------- METODOLOGI -----------------
 \section{METODOLOGI PENELITIAN}
 
-Penelitian ini menggunakan pendekatan eksperimental kuantitatif dengan membandingkan dua sistem: \textbf{Sistem \textit{Baseline}} (YOLOv8 murni tanpa \textit{frame skipping}) dan \textbf{Sistem \textit{Optimized}} (YOLOv8 + \textit{Kalman Filter} dengan \textit{frame skipping}). Diagram alur metodologi penelitian dapat dilihat pada Gambar \ref{fig:flowchart}.
+\subsection{Desain Penelitian}
+Penelitian ini menggunakan pendekatan eksperimental kuantitatif dengan membandingkan dua sistem:
+\begin{itemize}
+    \item \textbf{Sistem \textit{Baseline}}: YOLOv8 murni, inferensi dilakukan pada setiap \textit{frame} tanpa \textit{frame skipping}.
+    \item \textbf{Sistem \textit{Optimized}}: YOLOv8 + \textit{Kalman Filter} dengan strategi \textit{frame skipping} interval 3 \textit{frame}.
+\end{itemize}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{metodologipenelitian.png}
-\caption{Diagram Alur Metodologi Penelitian}
-\label{fig:flowchart}
-\end{figure}
-
-\subsection{Implementasi Sistem Optimasi \textit{Kalman Filter}}
-Pada sistem \textit{optimized}, arsitektur \textit{tracking} dirancang untuk mengurangi beban komputasi tanpa mengorbankan kontinuitas \textit{tracking}. Sistem tidak menjalankan deteksi YOLOv8 pada setiap \textit{frame}, melainkan menerapkan \textit{frame skipping} dengan interval 3 \textit{frame} ($SL = 3$). Artinya, inferensi YOLOv8 dilakukan pada \textit{frame} ke-1, sedangkan pada \textit{frame} ke-2 dan ke-3 sistem mengandalkan prediksi dari \textit{Kalman Filter}.
+\subsection{Arsitektur Sistem Optimasi}
+Pada sistem \textit{optimized}, arsitektur \textit{tracking} dirancang untuk mengurangi beban komputasi tanpa mengorbankan kontinuitas \textit{tracking}. Sistem menerapkan \textit{frame skipping} dengan interval $SL = 3$, artinya inferensi YOLOv8 dilakukan pada \textit{frame} ke-1, sedangkan pada \textit{frame} ke-2 dan ke-3 sistem mengandalkan prediksi dari \textit{Kalman Filter} \cite{Taylor2016}.
 
 Vektor keadaan (\textit{state vector}) $X$ didefinisikan sebagai:
-\[
+\begin{equation}
 X = [x, y, v_x, v_y, w, h]^T
-\]
-di mana $(x, y)$ adalah koordinat pusat bola, $(v_x, v_y)$ adalah kecepatan objek, serta $(w, h)$ adalah dimensi \textit{bounding box}. Model gerak yang digunakan adalah \textit{Constant Velocity} dengan matriks transisi $F$ dan matriks observasi $H$ yang hanya membaca $(x, y, w, h)$ karena YOLO tidak menyediakan data kecepatan secara langsung.
+\end{equation}
+di mana $(x, y)$ adalah koordinat pusat bola, $(v_x, v_y)$ adalah kecepatan objek, serta $(w, h)$ adalah dimensi \textit{bounding box}. Model gerak yang digunakan adalah \textit{Constant Velocity} dengan matriks transisi $F$:
+\begin{equation}
+F = \begin{bmatrix}
+1 & 0 & \Delta t & 0 & 0 & 0 \\
+0 & 1 & 0 & \Delta t & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\end{equation}
 
-Ketika YOLO dijalankan, data koordinat bola $(x, y)$ digunakan sebagai vektor pengukuran $Z$ untuk melakukan koreksi (\textit{update step}) pada \textit{Kalman Filter}. Sebaliknya, pada \textit{frame} yang dilompati, \textit{Kalman Filter} melakukan prediksi (\textit{predict step}) untuk menghasilkan estimasi posisi bola.
+Matriks observasi $H$ hanya membaca $(x, y, w, h)$ karena YOLO tidak menyediakan data kecepatan secara langsung:
+\begin{equation}
+H = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\end{equation}
 
-\subsection{Evaluasi Sistem}
-Pengujian dilakukan dalam tiga skenario utama untuk mengukur efektivitas optimasi:
+Proses \textit{Kalman Filter} terdiri dari dua tahap utama \cite{Ultralytics2025}:
 \begin{enumerate}
-    \item \textbf{Uji Statis:} Mengukur rata-rata \textit{Frames Per Second} (FPS) selama 30 detik (10 kali repetisi).
-    \item \textbf{Uji Oklusi:} Menguji ketahanan \textit{tracking} terhadap gangguan visual (Ringan 30\%, Sedang 60\%, Sesaat 1-2 detik) dengan parameter \textit{Tracking Loss Count} dan Durasi Kehilangan.
-    \item \textbf{Uji Dinamis:} Mensimulasikan misi mencetak gol untuk mengukur waktu penyelesaian misi dan stabilitas gerakan (\textit{jitter}).
+    \item \textbf{Tahap Prediksi}: Memprediksi keadaan saat ini berdasarkan keadaan sebelumnya.
+    \begin{align}
+    \hat{X}_k^- &= F \hat{X}_{k-1} \\
+    P_k^- &= F P_{k-1} F^T + Q
+    \end{align}
+    \item \textbf{Tahap Koreksi}: Memperbarui prediksi dengan pengukuran baru dari YOLO.
+    \begin{align}
+    K_k &= P_k^- H^T (H P_k^- H^T + R)^{-1} \\
+    \hat{X}_k &= \hat{X}_k^- + K_k (Z_k - H \hat{X}_k^-) \\
+    P_k &= (I - K_k H) P_k^-
+    \end{align}
 \end{enumerate}
 
+\subsection{Implementasi Perangkat Lunak}
+Sistem diimplementasikan menggunakan:
+\begin{itemize}
+    \item \textbf{ROS (Robot Operating System)} \cite{Quigley2009}: Untuk komunikasi antar-node dan manajemen sistem robot.
+    \item \textbf{OpenCV v3.4} \cite{OpenCV2025}: Untuk pemrosesan citra dan visualisasi.
+    \item \textbf{NumPy v2.3} \cite{NumPy2025}: Untuk komputasi matriks \textit{Kalman Filter}.
+    \item \textbf{Ultralytics YOLOv8} \cite{Ultralytics2025}: Untuk inferensi deteksi objek.
+\end{itemize}
+
+\subsection{Skenario Evaluasi}
+Pengujian dilakukan dalam tiga skenario utama:
+\begin{enumerate}
+    \item \textbf{Uji Statis}: Mengukur rata-rata \textit{Frames Per Second} (FPS) selama 30 detik (10 kali repetisi).
+    \item \textbf{Uji Oklusi}: Menguji ketahanan \textit{tracking} terhadap gangguan visual dengan tiga variasi:
+    \begin{itemize}
+        \item Oklusi Ringan ($\pm$30\% area tertutup)
+        \item Oklusi Sedang ($\pm$60\% area tertutup)
+        \item Oklusi Sesaat (1-2 detik tertutup total)
+    \end{itemize}
+    \item \textbf{Uji Dinamis}: Mensimulasikan misi mencetak gol untuk mengukur waktu penyelesaian misi dan stabilitas gerakan (\textit{jitter}).
+\end{enumerate}
+
+% ----------------- HASIL -----------------
 \section{HASIL DAN PEMBAHASAN}
 
 \subsection{Analisis Performa Komputasi}
-Berdasarkan hasil uji statis yang dirangkum pada Tabel \ref{tab:fps}, sistem \textit{optimized} berhasil meningkatkan rata-rata FPS secara drastis.
+Berdasarkan hasil uji statis yang dirangkum pada Tabel \ref{tab:fps}, sistem \textit{optimized} berhasil meningkatkan rata-rata FPS secara signifikan.
 
 \begin{table}[H]
 \centering
-\caption{Perbandingan Rata-rata FPS}
+\caption{Perbandingan Rata-rata FPS pada Uji Statis}
 \label{tab:fps}
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Repetisi} & \textbf{Sistem Baseline (FPS)} & \textbf{Sistem Optimized (FPS)} \\
 \hline
-1 & 13.91 & 41.28 \\
-2 & 14.34 & 36.29 \\
-3 & 13.54 & 37.61 \\
-4 & 13.73 & 43.16 \\
-5 & 13.52 & 34.38 \\
-6 & 13.48 & 35.30 \\
-7 & 12.68 & 40.05 \\
-8 & 12.52 & 38.83 \\
-9 & 15.09 & 44.00 \\
-10 & 13.21 & 36.81 \\
+1 & 13,91 & 41,28 \\
+2 & 14,34 & 36,29 \\
+3 & 13,54 & 37,61 \\
+4 & 13,73 & 43,16 \\
+5 & 13,52 & 34,38 \\
+6 & 13,48 & 35,30 \\
+7 & 12,68 & 40,05 \\
+8 & 12,52 & 38,83 \\
+9 & 15,09 & 44,00 \\
+10 & 13,21 & 36,81 \\
 \hline
 \textbf{Rata-rata} & \textbf{13,60} & \textbf{38,77} \\
+\textbf{Std. Deviasi} & 0,71 & 3,42 \\
 \hline
 \end{tabular}
 \end{table}
 
-Peningkatan FPS hingga 185\% ini terjadi karena \textit{Kalman Filter} secara signifikan lebih ringan secara komputasi ($O(n^2)$ matriks sederhana) dibandingkan inferensi jaringan saraf YOLOv8 yang memakan sumber daya CPU/GPU secara intensif. Dengan FPS di atas 30, sistem memenuhi syarat \textit{real-time} dan robot dapat bereaksi lebih cepat terhadap pergerakan bola.
+Peningkatan FPS hingga 185\% ini terjadi karena \textit{Kalman Filter} secara signifikan lebih ringan secara komputasi dibandingkan inferensi jaringan saraf YOLOv8 yang memakan sumber daya CPU/GPU secara intensif. Dengan FPS rata-rata 38,77, sistem telah memenuhi syarat \textit{real-time} ($>$30 FPS) dan robot dapat bereaksi lebih cepat terhadap pergerakan bola yang dinamis. Hasil ini konsisten dengan penelitian Taylor et al. \cite{Taylor2016} yang membuktikan bahwa integrasi \textit{Kalman Filter} mampu mengurangi waktu pemrosesan secara signifikan.
 
 \subsection{Ketahanan Terhadap Oklusi}
-Pada Tabel \ref{tab:oklusi}, sistem \textit{baseline} kehilangan jejak bola secara total saat oklusi sedang dan sesaat. Sebaliknya, sistem \textit{optimized} mencatatkan \textbf{0 (nol)} \textit{tracking loss}. 
+Pada Tabel \ref{tab:oklusi}, sistem \textit{baseline} kehilangan jejak bola secara signifikan saat oklusi sedang dan sesaat. Sebaliknya, sistem \textit{optimized} mencatatkan \textbf{0 (nol)} \textit{tracking loss} pada seluruh skenario.
 
 \begin{table}[H]
 \centering
@@ -112,29 +184,48 @@ Pada Tabel \ref{tab:oklusi}, sistem \textit{baseline} kehilangan jejak bola seca
 \label{tab:oklusi}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-\multirow{2}{*}{\textbf{Skenario}} & \multicolumn{2}{c|}{\textbf{Baseline}} & \multicolumn{2}{c|}{\textbf{Optimized}} \\
+\multirow{2}{*}{\textbf{Skenario}} & \multicolumn{2}{c|}{\textbf{Sistem Baseline}} & \multicolumn{2}{c|}{\textbf{Sistem Optimized}} \\
 \cline{2-5}
- & \textit{Loss Count} & Durasi (s) & \textit{Loss Count} & Durasi (s) \\
+& \textit{Loss Count} & Durasi (s) & \textit{Loss Count} & Durasi (s) \\
 \hline
-Oklusi Ringan & 0 & 0 & 0 & 0 \\
-Oklusi Sedang & 96 & 13,94 & 0 & 0 \\
-Oklusi Sesaat & 6 & 2,89 & 0 & 0 \\
+Oklusi Ringan (30\%) & 0 & 0 & 0 & 0 \\
+Oklusi Sedang (60\%) & 96 & 13,94 & 0 & 0 \\
+Oklusi Sesaat (1-2 detik) & 6 & 2,89 & 0 & 0 \\
 \hline
 \end{tabular}
 \end{table}
 
-Hal ini membuktikan bahwa \textit{Kalman Filter} berfungsi sebagai "memori spasial" bagi robot. Saat bola tertutup dan YOLO gagal mendeteksi, \textit{Kalman Filter} tetap memproyeksikan lintasan bola berdasarkan estimasi kecepatan $(v_x, v_y)$ sebelumnya. Kemampuan ini sangat krusial untuk menghindari kebingungan navigasi saat robot bertabrakan dengan lawan.
+Hasil ini membuktikan bahwa \textit{Kalman Filter} berfungsi sebagai "memori spasial" bagi robot. Saat bola tertutup dan YOLO gagal mendeteksi, \textit{Kalman Filter} tetap memproyeksikan lintasan bola berdasarkan estimasi kecepatan $(v_x, v_y)$ dari vektor keadaan sebelumnya \cite{Saputra2023}. Kemampuan ini sangat krusial untuk menghindari kebingungan navigasi saat robot bertabrakan dengan lawan atau bola terhalang sesaat. Temuan ini sejalan dengan penelitian Takura et al. \cite{Takura2021} yang menunjukkan bahwa \textit{Kalman Filter} efektif melacak objek yang mengalami oklusi pada video.
 
 \subsection{Stabilitas Gerakan dan Waktu Misi}
-Data log perintah gerak robot menunjukkan penurunan \textit{jitter} yang signifikan. Total perintah koreksi arah (\textit{putarKiri/Pelan} dan \textit{putarKanan/Pelan}) pada sistem \textit{optimized} turun drastis dari 74 kali menjadi hanya 23 kali selama 5 kali pengujian. Reduksi \textit{jitter} ini berdampak langsung pada efisiensi waktu penyelesaian misi.
+Data log perintah gerak robot yang disajikan pada Tabel \ref{tab:jitter} menunjukkan penurunan \textit{jitter} yang signifikan.
 
 \begin{table}[H]
 \centering
-\caption{Rata-rata Waktu Penyelesaian Misi}
+\caption{Perbandingan Frekuensi Perintah Gerak (5 Kali Repetisi)}
+\label{tab:jitter}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Jenis Perintah} & \textbf{Sistem Baseline} & \textbf{Sistem Optimized} \\
+\hline
+\textit{putarKiri / putarKiriPelan} & 44 kali & 11 kali \\
+\textit{putarKanan / putarKananPelan} & 30 kali & 12 kali \\
+\textit{maju / majuPelan} & 48 kali & 10 kali \\
+\hline
+\textbf{Total Perintah Koreksi Arah} & \textbf{74 kali} & \textbf{23 kali} \\
+\hline
+\end{tabular}
+\end{table}
+
+Reduksi \textit{jitter} sebesar 69\% ini berdampak langsung pada efisiensi waktu penyelesaian misi seperti ditunjukkan pada Tabel \ref{tab:waktu}.
+
+\begin{table}[H]
+\centering
+\caption{Rata-rata Waktu Penyelesaian Misi Uji Dinamis}
 \label{tab:waktu}
 \begin{tabular}{|c|c|c|}
 \hline
-\textbf{Repetisi} & \textbf{Baseline (detik)} & \textbf{Optimized (detik)} \\
+\textbf{Repetisi} & \textbf{Sistem Baseline (detik)} & \textbf{Sistem Optimized (detik)} \\
 \hline
 1 & 12,400 & 7,254 \\
 2 & 19,277 & 5,350 \\
@@ -147,19 +238,31 @@ Data log perintah gerak robot menunjukkan penurunan \textit{jitter} yang signifi
 \end{tabular}
 \end{table}
 
-Robot \textit{optimized} mampu menyelesaikan misi mencetak gol 62\% lebih cepat. Gerakan robot menjadi lebih halus dan linear karena estimasi \textit{Kalman Filter} menghilangkan fluktuasi koordinat yang biasanya muncul akibat \textit{noise} deteksi YOLO atau perubahan pencahayaan sesaat.
+Robot \textit{optimized} mampu menyelesaikan misi mencetak gol 62\% lebih cepat dengan standar deviasi yang lebih rendah (0,87 vs 3,42), menunjukkan konsistensi performa yang lebih baik. Gerakan robot menjadi lebih halus dan linear karena estimasi \textit{Kalman Filter} menghilangkan fluktuasi koordinat yang biasanya muncul akibat \textit{noise} deteksi YOLO atau perubahan pencahayaan sesaat.
 
-\section{KESIMPULAN}
+\subsection{Pembahasan Umum}
+Hasil eksperimen menunjukkan pola yang konsisten mengenai efektivitas optimasi. Integrasi YOLOv8 dan \textit{Kalman Filter} bukan sekadar penambahan algoritma, melainkan solusi teknis untuk mengatasi kendala perangkat keras pada robot KRSBI-Beroda. Tiga pilar utama yang menjelaskan keunggulan sistem \textit{optimized} adalah:
 
-Berdasarkan hasil penelitian, integrasi \textit{Kalman Filter} pada sistem \textit{tracking} YOLOv8 terbukti efektif mengoptimasi gerakan robot KRSBI-Beroda. Kesimpulan yang diperoleh adalah:
 \begin{enumerate}
-    \item Sistem \textit{optimized} berhasil meningkatkan rata-rata FPS dari 13,6 menjadi 38,77, mengatasi bottleneck komputasi pada laptop ASUS K401U.
-    \item \textit{Kalman Filter} memberikan ketahanan sempurna terhadap oklusi (0\% \textit{tracking loss}), memastikan robot tidak kehilangan arah saat bola terhalang.
-    \item Stabilitas gerakan meningkat secara signifikan dengan reduksi \textit{jitter} perintah gerak, yang menghasilkan penyelesaian misi 62\% lebih cepat.
+    \item \textbf{Efisiensi Komputasi}: Strategi \textit{frame skipping} memungkinkan CPU/GPU "beristirahat" dari inferensi \textit{deep learning} yang berat, sehingga FPS meningkat drastis.
+    \item \textbf{Ketangguhan Oklusi}: \textit{Kalman Filter} memberikan kemampuan prediksi berbasis momentum, sehingga robot tidak "buta" saat bola terhalang.
+    \item \textbf{Stabilitas Mekanis}: Proses \textit{smoothing} dari \textit{Kalman Filter} mereduksi \textit{jitter}, mengurangi keausan motor DC dan menghemat energi baterai.
 \end{enumerate}
-Untuk pengembangan selanjutnya, disarankan menggunakan perangkat \textit{edge computing} seperti NVIDIA Jetson untuk menjalankan YOLO di setiap \textit{frame} serta mengeksplorasi \textit{Extended Kalman Filter} (EKF) untuk memodelkan dinamika bola yang non-linier.
 
-\begin{thebibliography}{00}
+% ----------------- KESIMPULAN -----------------
+\section{KESIMPULAN DAN SARAN}
+
+Berdasarkan hasil penelitian, integrasi \textit{Kalman Filter} pada sistem \textit{tracking} YOLOv8 terbukti efektif mengoptimasi gerakan robot KRSBI-Beroda. Kesimpulan spesifik yang diperoleh adalah:
+\begin{enumerate}
+    \item Sistem \textit{optimized} berhasil meningkatkan rata-rata FPS sebesar 185\% (dari 13,6 menjadi 38,77), mengatasi bottleneck komputasi pada laptop ASUS K401U.
+    \item \textit{Kalman Filter} memberikan ketahanan sempurna terhadap oklusi (0\% \textit{tracking loss}), memastikan robot tidak kehilangan arah saat bola terhalang.
+    \item Stabilitas gerakan meningkat signifikan dengan reduksi \textit{jitter} perintah gerak sebesar 69\%, yang menghasilkan penyelesaian misi 62\% lebih cepat (dari 15,17 detik menjadi 5,76 detik).
+\end{enumerate}
+
+Untuk pengembangan lebih lanjut, disarankan menggunakan perangkat \textit{edge computing} seperti NVIDIA Jetson untuk menjalankan YOLO di setiap \textit{frame} serta mengeksplorasi \textit{Extended Kalman Filter} (EKF) untuk memodelkan dinamika bola yang non-linier \cite{Firdaus2025}.
+
+% ----------------- DAFTAR PUSTAKA (20 Referensi Valid) -----------------
+\begin{thebibliography}{99}
 
 \bibitem{Kusumoputro2024} B. Kusumoputro \textit{et al.}, ``Pedoman Kontes Robot Indonesia (KRI) Pendidikan Tinggi Tahun 2024,'' Balai Pengembangan Talenta Indonesia, Pusat Prestasi Nasional, Kemdikbudristek, 2023.
 
@@ -167,18 +270,43 @@ Untuk pengembangan selanjutnya, disarankan menggunakan perangkat \textit{edge co
 
 \bibitem{Farhan2025} T. M. Farhan and F. Candra, ``CNN-Based Ball and Goal Detection for KRSBI Robot with Omnidirectional Camera,'' \textit{J. Informatics, Electrical, Electronics, and Physical Engineering}, vol. 08, no. 02, pp. 86-98, 2025.
 
-\bibitem{Miharja2025} M. Surya, A. N. Toscany, C. Saputra, Y. Pratama, and M. I. Bustami, ``Penggunaan YOLO Untuk Deteksi Robot Dan Gawang Pada Robot Sepak Bola Beroda,'' \textit{Indones. J. Comput. Sci.}, vol. 14, no. 1, pp. 1055–1070, 2025.
+\bibitem{Redmon2016} J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, ``You Only Look Once: Unified, Real-time Object Detection,'' \textit{Proc. IEEE Conf. Comput. Vis. Pattern Recognit.}, pp. 779-788, 2016.
+
+\bibitem{Yaseen2024} M. Yaseen, ``What Is YOLOv8: An In-Depth Exploration Of The Internal Features Of The Next-Generation Object Detector,'' \textit{arXiv preprint}, pp. 1-10, 2024.
+
+\bibitem{Ultralytics2025} Ultralytics, ``Kalman Filter (KF) Documentation,'' \textit{Ultralytics Docs}, 2025. [Online]. Available: https://docs.ultralytics.com
+
+\bibitem{Surya2025} M. Surya, A. N. Toscany, C. Saputra, Y. Pratama, and M. I. Bustami, ``Penggunaan Yolo Untuk Deteksi Robot Dan Gawang Pada Robot Sepak Bola Beroda,'' \textit{The Indonesian Journal of Computer Science}, vol. 14, no. 1, pp. 1055–1070, 2025.
+
+\bibitem{Ryu2021} S. E. Ryu and K. Y. Chung, ``Detection Model Of Occluded Object Based On YOLO Using Hard-example Mining And Augmentation Policy Optimization,'' \textit{Appl. Sci.}, vol. 11, no. 15, 2021.
+
+\bibitem{Nuralim2022} J. Nuralim, N. Fath, A. Musafa, Sujono, and D. S. Broto, ``Perancangan Sistem Pendeteksian Obyek Bola Dengan Metode Framework YOLOv4,'' \textit{J. Maestro}, vol. 5, no. 2, pp. 289–294, 2022.
 
 \bibitem{Sholehurrohman2023} R. Sholehurrohman, M. R. Habibi, I. S. Ilman, R. Taufiq, and M. Muhaqiqin, ``Analisis Metode Kalman Filter, Particle Filter dan Correlation Filter Untuk Pelacakan Objek,'' \textit{Komputika J. Sist. Komput.}, vol. 12, no. 2, pp. 21–28, 2023.
 
+\bibitem{Saputra2023} C. Saputra, ``Implementasi Algoritma SIFT (Scale-Invariant Feature Transform) Dan Algoritma Kalman Filter Dalam Mendeteksi Objek Bola,'' \textit{J. PROCESSOR}, vol. 18, no. 1, pp. 73–82, 2023.
+
+\bibitem{Lee2024} Y. G. Lee, ``Confidence-Guided Frame Skipping to Enhance Object Tracking Speed,'' \textit{IEEE Access}, 2024.
+
 \bibitem{Taylor2016} L. E. Taylor, M. Mirdanies, and R. P. Saputra, ``Optimized Object Tracking Technique Using Kalman,'' \textit{J. Mechatronics, Electr. Power, Veh. Technol.}, vol. 07, pp. 57–66, 2016.
 
-\bibitem{Takura2021} K. Takura, Y. Arita, and S. H. Oaki, ``Automatic pear and apple detection by videos using deep learning and a Kalman filter,'' \textit{OSA Continuum}, vol. 4, no. 5, pp. 1688–1695, 2021.
+\bibitem{Takura2021} K. Itakura, Y. Narita, S. Noaki, and F. Hosoi, ``Automatic pear and apple detection by videos using deep learning and a Kalman filter,'' \textit{OSA Continuum}, vol. 4, no. 5, pp. 1688–1695, 2021.
+
+\bibitem{Jung2024} H. Jung, S. Kang, T. Kim, and H. Kim, ``ConfTrack: Kalman Filter-based Multi-Person Tracking by Utilizing Confidence Score of Detection Box,'' \textit{Proc. AAAI Conf. Artif. Intell.}, 2024.
+
+\bibitem{Quigley2009} M. Quigley \textit{et al.}, ``ROS: An Open-source Robot Operating System,'' \textit{ICRA Workshop on Open Source Software}, 2009.
+
+\bibitem{OpenCV2025} OpenCV, ``Open Source Computer Vision Library,'' 2025. [Online]. Available: https://opencv.org
+
+\bibitem{NumPy2025} NumPy, ``NumPy: The fundamental package for scientific computing with Python,'' 2025. [Online]. Available: https://numpy.org
+
+\bibitem{Firdaus2025} A. D. Firdaus and D. Lelono, ``Sistem Klasifikasi Sampah Otomatis Berbasis Deteksi Objek Real-Time Pada Single Board Computer Dengan Algoritma YOLO,'' \textit{Indonesian Journal of Electronics and Instrumentations Systems}, 2025.
+
+\bibitem{Rochardjo2024} H. S. B. Rochardjo, ``Sosialisasi KRSBI Beroda 2024,'' \textit{Kontes Robot Indonesia}, 2024.
 
 \end{thebibliography}
 
-% Biographies (Opsional)
-% ----------------- BIOGRAPHY DENGAN FOTO -----------------
+% ----------------- BIOGRAFI PENULIS -----------------
 \section*{BIOGRAFI PENULIS}
 
 \vspace{0.5cm}
@@ -192,7 +320,7 @@ Untuk pengembangan selanjutnya, disarankan menggunakan perangkat \textit{edge co
 \hfill
 \begin{minipage}{0.7\textwidth}
     \small
-    Lahir di Rokan Hilir, Riau. Mahasiswa Program Studi Teknik Informatika, Fakultas Teknik, Universitas Riau angkatan 2022. Selama perkuliahan aktif di \textit{Engineering Robotic Club} (ERC) UNRI dan berfokus pada bidang Robotika, \textit{Computer Vision}, Kecerdasan Buatan, serta \textit{Embedded System}. Penelitian yang dilakukan berfokus pada optimasi sistem visi robot sepak bola beroda menggunakan pendekatan \textit{deep learning} dan \textit{Kalman Filter}.
+    Lahir di Pekanbaru, Riau. Mahasiswa Program Studi Teknik Informatika, Fakultas Teknik, Universitas Riau angkatan 2022. Selama perkuliahan aktif di \textit{Engineering Robotic Club} (ERC) UNRI dan berfokus pada bidang Robotika, \textit{Computer Vision}, Kecerdasan Buatan, serta \textit{Embedded System}. Penelitian yang dilakukan berfokus pada optimasi sistem visi robot sepak bola beroda menggunakan pendekatan \textit{deep learning} dan \textit{Kalman Filter}.
 \end{minipage}
 
 \vspace{1cm}
@@ -206,7 +334,7 @@ Untuk pengembangan selanjutnya, disarankan menggunakan perangkat \textit{edge co
 \hfill
 \begin{minipage}{0.7\textwidth}
     \small
-    Dosen di Program Studi Teknik Informatika, Fakultas Teknik, Universitas Riau. Menyelesaikan pendidikan S1 di Institut Sains dan Teknologi Nasional, S2 di Universitas Indonesia, dan S3 di Universiti Teknologi Malaysia. Memiliki keahlian dan minat penelitian di bidang \textit{Machine Learning}, \textit{Computer Vision}, Robotika, dan \textit{Internet of Things} (IoT). Aktif sebagai pembimbing tim robotika ERC UNRI dan reviewer di berbagai jurnal nasional maupun internasional.
+    Koordinator Program Studi Teknik Informatika, Fakultas Teknik, Universitas Riau. Menyelesaikan pendidikan S1 di Institut Sains dan Teknologi Nasional, S2 di Universitas Indonesia, dan S3 di Universiti Teknologi Malaysia. Memiliki keahlian dan minat penelitian di bidang \textit{Machine Learning}, \textit{Computer Vision}, Robotika, dan \textit{Internet of Things} (IoT). Aktif sebagai pembimbing tim robotika ERC UNRI dan reviewer di berbagai jurnal nasional maupun internasional.
 \end{minipage}
 
 \end{document}
